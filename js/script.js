@@ -6,6 +6,7 @@ const responseCodes = [
     'token empty'
 ];
 
+let showingInfo = false;
 const categories = [];
 
 function getRandomInt(min, max) {
@@ -52,29 +53,40 @@ function makeTable(headers, id) {
 
 
 $("#infoBtn").click(function() {
-    const table = makeTable(["Category", "Easy", "Medium", "Hard", "Total"], "infoTable");
-    for (let i = 0; i < categories.length; i++) {
-        let tr = table.insertRow();
-
-        $.getJSON("https://opentdb.com/api_count.php?category=" + categories[i].id, function(data) {
-            let thisCategoryData = data.category_question_count;
-            
-            let tdCat = tr.insertCell();
-            tdCat.appendChild(document.createTextNode(categories[i].name));
-
-            let tdEasy = tr.insertCell();
-            tdEasy.appendChild(document.createTextNode(thisCategoryData.total_easy_question_count));
-
-            let tdMed = tr.insertCell();
-            tdMed.appendChild(document.createTextNode(thisCategoryData.total_medium_question_count));
-
-            let tdHard = tr.insertCell();
-            tdHard.appendChild(document.createTextNode(thisCategoryData.total_hard_question_count));
-
-            let tdTotal = tr.insertCell();
-            tdTotal.appendChild(document.createTextNode(thisCategoryData.total_question_count));
-        });
-
+    let tableID = "infoTable";
+    if (!showingInfo) {
+        // Show the table
+        const table = makeTable(["Category", "Easy", "Medium", "Hard", "Total"], tableID);
+        for (let i = 0; i < categories.length; i++) {
+            let tr = table.insertRow();
+    
+            $.getJSON("https://opentdb.com/api_count.php?category=" + categories[i].id, function(data) {
+                let thisCategoryData = data.category_question_count;
+                
+                let tdCat = tr.insertCell();
+                tdCat.appendChild(document.createTextNode(categories[i].name));
+    
+                let tdEasy = tr.insertCell();
+                tdEasy.appendChild(document.createTextNode(thisCategoryData.total_easy_question_count));
+    
+                let tdMed = tr.insertCell();
+                tdMed.appendChild(document.createTextNode(thisCategoryData.total_medium_question_count));
+    
+                let tdHard = tr.insertCell();
+                tdHard.appendChild(document.createTextNode(thisCategoryData.total_hard_question_count));
+    
+                let tdTotal = tr.insertCell();
+                tdTotal.appendChild(document.createTextNode(thisCategoryData.total_question_count));
+            });
+    
+        }
+        $('#quizInfo').append(table);
+        showingInfo = true;
     }
-    $('#quizInfo').append(table);
+    else {
+        // Hide the table.
+        $(`#${tableID}`).remove();
+        showingInfo = false;
+    }
+    
 });
