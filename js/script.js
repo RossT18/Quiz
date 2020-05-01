@@ -6,6 +6,13 @@ const responseCodes = [
     'token empty'
 ];
 
+const questionLetters = [
+    'A. ',
+    'B. ',
+    'C. ',
+    'D. '
+];
+
 $.ajaxSetup({ async: false }); // Probably should deal with async methods properly but this will do, for now.
 
 //#region Loading Category Information
@@ -106,6 +113,18 @@ function loadQuestions(token, count) {
     return qs;
 }
 
+function shuffle(arr) {
+    let arrCopy = JSON.parse(JSON.stringify(arr)); //Deep copy array.
+    let shuffled = [];
+
+    while (arrCopy.length > 0) {
+        let rndElement = arrCopy[getRandomInt(0, arrCopy.length)];
+        shuffled.push(rndElement);
+        arrCopy.splice(arrCopy.indexOf(rndElement), 1);
+    }
+    return shuffled;
+}
+
 $("#startBtn").click(function() {
     // Create a session.
     let token = getToken();
@@ -114,10 +133,14 @@ $("#startBtn").click(function() {
     const questionList = loadQuestions(token, 10);
     // Show the question, 4 options as buttons
     const q = questionList[questionNumber];
-    const questionOutput = `<b>Question ${questionNumber + 1}</b><br>
+    const answers = shuffle(q.incorrect_answers.concat(q.correct_answer));
+    let questionOutput = `<b>Question ${questionNumber + 1}</b><br>
                             Category: ${q.category}<br>
                             Difficulty: ${q.difficulty}<br>
                             <br>
                             <b>${q.question}</b><br>`
+    for (let i = 0; i < answers.length; i++) {
+        questionOutput += `${questionLetters[i]}${answers[i]}<br>`;
+    }
     $("#questionPanel").append(questionOutput);
 });
