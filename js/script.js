@@ -6,30 +6,11 @@ const responseCodes = [
     'token empty'
 ];
 
+$.ajaxSetup({ async: false }); // Probably should deal with async methods properly but this will do, for now.
+
+//#region Loading Category Information
 let showingInfo = false;
 const categories = [];
-
-function getRandomInt(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
-  }
-
-
-$.getJSON('https://opentdb.com/api.php?amount=10&category=9&difficulty=easy&type=multiple', function(data) {
-    const responseCode = data.response_code;
-    if (responseCode != 0) {
-        alert(responseCode + " : " + responseCodes[responseCode]);
-    }
-    else {
-        const results = data.results;
-        const qCount = results.length; // Question Count
-        let qNumber = getRandomInt(0, qCount);
-        let text = `Category: ${results[qNumber].category}<br>
-                    Question: ${results[qNumber].question}<br>`
-    }
-    
-});
 
 $.getJSON('https://opentdb.com/api_category.php', function(data) {
     const categoriesRes = data.trivia_categories;
@@ -50,7 +31,6 @@ function makeTable(headers, id) {
 
     return table;
 }
-
 
 $("#infoBtn").click(function() {
     let tableID = "infoTable";
@@ -88,5 +68,56 @@ $("#infoBtn").click(function() {
         $(`#${tableID}`).remove();
         showingInfo = false;
     }
-    
+});
+//#endregion
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min)) + min; //The maximum is exclusive and the minimum is inclusive
+}
+
+function getToken() {
+    let token = "";
+    $.getJSON(`https://opentdb.com/api_token.php?command=request`, function(data) {
+        const responseCode = data.response_code;
+        if (responseCode == 0) {
+            token = data.token;
+        }
+        else {
+            alert(`ERROR: ${responseCode} - ${responseCodes[responseCode]}`);
+        }
+    });
+    return token;
+}
+
+function loadQuestions(token, count) {
+    let qs = [];
+    let fullLink = `https://opentdb.com/api.php?amount=${count}&token=${token}&type=multiple`;
+    $.getJSON(fullLink, function(data) {
+        const responseCode = data.response_code;
+        if (responseCode == 0) {
+            qs = data.results;
+        }
+        else {
+            alert(`ERROR: ${responseCode} - ${responseCodes[responseCode]}`);
+        }
+    });
+    return qs;
+}
+
+$("#startBtn").click(function() {
+    // Create a session.
+    let token = getToken();
+    // Get a random question from any category
+    let questionNumber = 0;
+    const questionList = loadQuestions(token, 10);
+    // Show the question, 4 options as buttons
+    const q = questionList[questionNumber];
+    const questionOutput = `<b>Question ${questionNumber + 1}</b><br>
+                            Category: ${q.category}<br>
+                            Difficulty: ${q.difficulty}<br>
+                            <br>
+                            <b>${q.question}</b><br>`
+    $("#questionPanel").append(questionOutput);
 });
