@@ -2,3 +2,34 @@
     margin: 0;
     padding: 0;
 }
+
+#infoTable {
+    border: 1px solid #000000;
+    width: 50%;
+    text-align: left;
+    border-collapse: collapse;
+    font-family: 'Segoe UI' Arial, Helvetica, sans-serif;
+}
+#infoTable td, #infoTable th {
+    border: 1px solid #AAAAAA;
+    padding: 3px 2px;
+}
+#infoTable tbody td {
+    font-size: 18px;
+}
+#infoTable tr:nth-child(even) {
+    background: #EEEEEE;
+}
+#infoTable thead {
+    background: #2CB445;
+    border-bottom: 2px solid #444444;
+}
+#infoTable thead th {
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFFFFF;
+    border-left: 2px solid #97A5B2;
+}
+#infoTable thead th:first-child {
+    border-left: none;
+}
