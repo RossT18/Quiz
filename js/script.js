@@ -125,6 +125,23 @@ function shuffle(arr) {
     return shuffled;
 }
 
+function showQuestion(q, num) {
+
+    $("#qNumP").html(`Question ${num + 1}`);
+    $("#qInfoP").html(`${q.category}<br>${q.difficulty}`);
+
+    $("#qP").html(q.question);
+
+    const answers = shuffle(q.incorrect_answers.concat(q.correct_answer));
+    for (let i = 0; i < answers.length; i++) {
+        let newBtn = document.createElement("button");
+        newBtn.innerHTML = `${questionLetters[i]}${answers[i]}`;
+        newBtn.setAttribute('class', 'answerBtn');
+        newBtn.setAttribute('value', answers[i]);
+        $("#qAnswerPanel").append(newBtn);
+    }
+}
+
 $("#startBtn").click(function() {
     // Create a session.
     let token = getToken();
@@ -133,14 +150,5 @@ $("#startBtn").click(function() {
     const questionList = loadQuestions(token, 10);
     // Show the question, 4 options as buttons
     const q = questionList[questionNumber];
-    const answers = shuffle(q.incorrect_answers.concat(q.correct_answer));
-    let questionOutput = `<b>Question ${questionNumber + 1}</b><br>
-                            Category: ${q.category}<br>
-                            Difficulty: ${q.difficulty}<br>
-                            <br>
-                            <b>${q.question}</b><br>`
-    for (let i = 0; i < answers.length; i++) {
-        questionOutput += `${questionLetters[i]}${answers[i]}<br>`;
-    }
-    $("#questionPanel").append(questionOutput);
+    showQuestion(q, questionNumber);
 });
