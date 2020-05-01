@@ -126,12 +126,12 @@ function shuffle(arr) {
 }
 
 function showQuestion(q, num) {
-
     $("#qNumP").html(`Question ${num + 1}`);
     $("#qInfoP").html(`${q.category}<br>${q.difficulty}`);
 
     $("#qP").html(q.question);
 
+    $("#qAnswerPanel").empty();
     const answers = shuffle(q.incorrect_answers.concat(q.correct_answer));
     for (let i = 0; i < answers.length; i++) {
         let newBtn = document.createElement("button");
@@ -143,6 +143,9 @@ function showQuestion(q, num) {
 }
 
 $("#startBtn").click(function() {
+    // Remove welcome div and show the question panel.
+    $("#startDiv").remove();
+    document.getElementById("questionPanel").style.display = 'flex';
     // Create a session.
     let token = getToken();
     // Get a random question from any category
