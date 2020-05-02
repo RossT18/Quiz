@@ -142,6 +142,7 @@ function showQuestion() {
         })
         $("#qP").html(`Finished!<br>You Scored: ${correctCount}`);
         $("#qAnswerPanel").empty();
+        $("#timerBar").remove();
         return;
     }
 
@@ -170,7 +171,10 @@ let id = 0;
 let timerTicking = false;
 function toggleQuestionTimer() {
     if (!timerTicking) {
-        $("#timerBar").css('background-color', '#FFFFFF');
+        $("#timerBar").css({
+            'background-color': '#FFFFFF',
+            'border-color': '#FFFFFF'
+        });
         let width = 1;
         timerTicking = true;
         id = setInterval(function() {
@@ -217,7 +221,9 @@ function lightCorrectAnswer() {
             $(btn).css({
                 'font-weight': 'bold',
                 'text-decoration': 'none',
-                'border-color': '#33db1d'
+                'border-color': '#3be026',
+                'background': 'none',
+                'background-color': '#3be026'
             });
         }
     }
@@ -244,14 +250,18 @@ $(document).on("click", ".answerBtn", function() {
             $(clickedBtn).css({
                 'font-weight': 'bold',
                 'text-decoration': 'none',
-                'border-color': '#33db1d'
+                'border-color': '#3be026',
+                'background': 'none',
+                'background-color': '#3be026'
             });
             correctCount++;
         }
         else {
             $(clickedBtn).css({
-                'border-color': '#FF0000',
-                'text-decoration': 'none'
+                'border-color': '#c91414',
+                'text-decoration': 'none',
+                'background': 'none',
+                'background-color': '#c91414'
             });
             lightCorrectAnswer();
         }

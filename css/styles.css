@@ -42,7 +42,7 @@ body {
 }
 
 button {
-	background:linear-gradient(to bottom, #33bdef 5%, #019ad2 100%);
+    background:linear-gradient(to bottom, #33bdef 5%, #019ad2 100%);
 	background-color:#33bdef;
 	border-radius:16px;
 	border:5px solid #057fd0;
