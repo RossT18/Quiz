@@ -127,8 +127,23 @@ function shuffle(arr) {
 
 let correctAnswer = "";
 let questionNumber = 0;
+let questions = [];
+let correctCount = 0;
 
-function showQuestion(q) {
+function showQuestion() {
+    if (questionNumber >= questions.length) {
+        //There is no next question
+        $("#qNumP").remove();
+        $("#qInfoP").remove();
+        $("#qP").css({
+            'font-size': '40px'
+        })
+        $("#qP").html(`Finished!<br>You Scored: ${correctCount}`);
+        $("#qAnswerPanel").empty();
+        return;
+    }
+
+    const q = questions[questionNumber];
     $("#qNumP").html(`Question ${questionNumber + 1}`);
     $("#qInfoP").html(`${q.category}<br>${q.difficulty}`);
 
@@ -144,6 +159,7 @@ function showQuestion(q) {
         newBtn.setAttribute('value', answers[i]);
         $("#qAnswerPanel").append(newBtn);
     }
+    questionNumber++;
 }
 
 $(document).on("click", ".answerBtn", function() {
@@ -152,7 +168,7 @@ $(document).on("click", ".answerBtn", function() {
     const value = $(this).attr('value');
     const isCorrect = value === correctAnswer;
     const correctAnswerDelay = 3000;
-    const nextQuestionDelay = correctAnswer + 4000;
+    const nextQuestionDelay = correctAnswerDelay + 3000;
 
     $(this).css({
         'border-color': '#FFFFFF',
@@ -168,6 +184,7 @@ $(document).on("click", ".answerBtn", function() {
                 'text-decoration': 'none',
                 'border-color': '#33db1d'
             });
+            correctCount++;
         }
         else {
             $(clickedBtn).css({
@@ -187,7 +204,7 @@ $(document).on("click", ".answerBtn", function() {
         }
     }, correctAnswerDelay);
     setTimeout(() => {
-        console.log("Should either move on or start again");
+        showQuestion();
     }, nextQuestionDelay);
 });
 
@@ -198,8 +215,7 @@ $("#startBtn").click(function() {
     // Create a session.
     let token = getToken();
     // Get a random question from any category
-    const questionList = loadQuestions(token, 10);
+    questions = loadQuestions(token, 10);
     // Show the question, 4 options as buttons
-    const q = questionList[questionNumber];
-    showQuestion(q, questionNumber);
+    showQuestion();
 });
