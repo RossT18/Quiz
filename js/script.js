@@ -162,6 +162,65 @@ function showQuestion() {
         $("#qAnswerPanel").append(newBtn);
     }
     questionNumber++;
+
+    toggleQuestionTimer();
+}
+
+let id = 0;
+let timerTicking = false;
+function toggleQuestionTimer() {
+    if (!timerTicking) {
+        $("#timerBar").css('background-color', '#FFFFFF');
+        let width = 1;
+        timerTicking = true;
+        id = setInterval(function() {
+            if (width >= 100) {
+                clearInterval(id);
+                outOfTime();
+            }
+            else {
+                width++;
+                $("#timerBar").css('width', `${width}%`);
+            }
+        }, 100);
+    }
+    else {
+        resetTimer()
+    }
+}
+
+function resetTimer() {
+    clearInterval(id);
+    timerTicking = false;
+}
+
+function outOfTime() {
+    // If here is reached, they definitely haven't clicked anything and have run out of time on the question.
+    // Do a wrong.
+    // Will just have to show a red time bar and disable choosing instead of light up an answer with red.
+    $("#timerBar").css({
+        'background-color': '#FF0000',
+        'border-color': '#800000'
+    });
+    $(".answerBtn").attr('disabled', true);
+    lightCorrectAnswer();
+    setTimeout(() => {
+        showQuestion();
+    }, 3000);
+    resetTimer();
+}
+
+function lightCorrectAnswer() {
+    const ansBtns = document.getElementsByClassName("answerBtn");
+    for (let btn of ansBtns) {
+        if (btn.value === correctAnswer) {
+            $(btn).css({
+                'font-weight': 'bold',
+                'text-decoration': 'none',
+                'border-color': '#33db1d'
+            });
+        }
+    }
 }
 
 $(document).on("click", ".answerBtn", function() {
@@ -170,6 +229,8 @@ $(document).on("click", ".answerBtn", function() {
     const isCorrect = value === correctAnswer;
     const correctAnswerDelay = 3000;
     const nextQuestionDelay = correctAnswerDelay + 3000;
+
+    toggleQuestionTimer();
 
     $(this).css({
         'border-color': '#FFFFFF',
@@ -192,16 +253,7 @@ $(document).on("click", ".answerBtn", function() {
                 'border-color': '#FF0000',
                 'text-decoration': 'none'
             });
-            const ansBtns = document.getElementsByClassName("answerBtn");
-            for (let btn of ansBtns) {
-                if (btn.value === correctAnswer) {
-                    $(btn).css({
-                        'font-weight': 'bold',
-                        'text-decoration': 'none',
-                        'border-color': '#33db1d'
-                    });
-                }
-            }
+            lightCorrectAnswer();
         }
     }, correctAnswerDelay);
     setTimeout(() => {
