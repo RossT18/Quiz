@@ -146,7 +146,7 @@ function showQuestion() {
     }
 
     const q = questions[questionNumber];
-    $("#qNumP").html(`Question ${questionNumber + 1}`);
+    $("#qNumP").html(`Question #${questionNumber + 1}`);
     $("#qInfoP").html(`${q.category}<br>${q.difficulty}`);
 
     $("#qP").html(q.question);
@@ -165,7 +165,6 @@ function showQuestion() {
 }
 
 $(document).on("click", ".answerBtn", function() {
-
     const clickedBtn = this;
     const value = $(this).attr('value');
     const isCorrect = value === correctAnswer;
