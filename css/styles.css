@@ -34,11 +34,11 @@
     border-left: none;
 }
 
-button, input[type="button"] {
+button {
 	background:linear-gradient(to bottom, #33bdef 5%, #019ad2 100%);
 	background-color:#33bdef;
 	border-radius:16px;
-	border:2px solid #057fd0;
+	border:3px solid #057fd0;
 	display:inline-block;
 	cursor:pointer;
 	color:#ffffff;
@@ -48,9 +48,14 @@ button, input[type="button"] {
     text-shadow:0px 1px 5px #5b6178;
     margin: 5px;
 }
-button:hover, input[type="button"]:hover {
+
+button:hover:enabled {
 	background:linear-gradient(to bottom, #019ad2 5%, #33bdef 100%);
 	background-color:#019ad2;
+}
+
+button:disabled {
+    cursor: not-allowed;
 }
 
 #questionPanel {

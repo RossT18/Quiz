@@ -125,14 +125,18 @@ function shuffle(arr) {
     return shuffled;
 }
 
-function showQuestion(q, num) {
-    $("#qNumP").html(`Question ${num + 1}`);
+let correctAnswer = "";
+let questionNumber = 0;
+
+function showQuestion(q) {
+    $("#qNumP").html(`Question ${questionNumber + 1}`);
     $("#qInfoP").html(`${q.category}<br>${q.difficulty}`);
 
     $("#qP").html(q.question);
 
     $("#qAnswerPanel").empty();
     const answers = shuffle(q.incorrect_answers.concat(q.correct_answer));
+    correctAnswer = q.correct_answer;
     for (let i = 0; i < answers.length; i++) {
         let newBtn = document.createElement("button");
         newBtn.innerHTML = `${questionLetters[i]}${answers[i]}`;
@@ -142,6 +146,51 @@ function showQuestion(q, num) {
     }
 }
 
+$(document).on("click", ".answerBtn", function() {
+
+    const clickedBtn = this;
+    const value = $(this).attr('value');
+    const isCorrect = value === correctAnswer;
+    const correctAnswerDelay = 3000;
+    const nextQuestionDelay = correctAnswer + 4000;
+
+    $(this).css({
+        'border-color': '#FFFFFF',
+        'text-decoration': 'underline'
+    });
+
+    $(".answerBtn").attr('disabled', true);
+
+    setTimeout(() => {
+        if (isCorrect) {
+            $(clickedBtn).css({
+                'font-weight': 'bold',
+                'text-decoration': 'none',
+                'border-color': '#33db1d'
+            });
+        }
+        else {
+            $(clickedBtn).css({
+                'border-color': '#800000',
+                'text-decoration': 'none'
+            });
+            const ansBtns = document.getElementsByClassName("answerBtn");
+            for (let btn of ansBtns) {
+                if (btn.value === correctAnswer) {
+                    $(btn).css({
+                        'font-weight': 'bold',
+                        'text-decoration': 'none',
+                        'border-color': '#33db1d'
+                    });
+                }
+            }
+        }
+    }, correctAnswerDelay);
+    setTimeout(() => {
+        console.log("Should either move on or start again");
+    }, nextQuestionDelay);
+});
+
 $("#startBtn").click(function() {
     // Remove welcome div and show the question panel.
     $("#startDiv").remove();
@@ -149,7 +198,6 @@ $("#startBtn").click(function() {
     // Create a session.
     let token = getToken();
     // Get a random question from any category
-    let questionNumber = 0;
     const questionList = loadQuestions(token, 10);
     // Show the question, 4 options as buttons
     const q = questionList[questionNumber];
