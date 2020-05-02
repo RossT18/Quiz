@@ -4,6 +4,13 @@
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
 }
 
+body {
+    background-image: url('/images/background.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: 100% 100%;
+}
+
 #infoTable {
     border: 1px solid #000000;
     width: 50%;
@@ -60,16 +67,12 @@ button:disabled {
 
 #questionPanel {
     position: absolute;
-    top: 50%;
+    top: 82%;
     left: 50%;
     transform: translate(-50%, -50%);
 
-    width: auto;
-    max-width: 80%;
-    min-width: 40%;
-    height: auto;
-    max-height: 60%;
-    min-height: 35%;
+    width: 76%;
+    height: 32%;
 
     display: flex;
     justify-content: space-between;
