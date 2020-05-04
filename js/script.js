@@ -16,6 +16,7 @@ const questionLetters = [
 $.ajaxSetup({ async: false }); // Probably should deal with async methods properly but this will do, for now.
 
 //#region Loading Category Information
+/*
 let showingInfo = false;
 const categories = [];
 
@@ -39,7 +40,7 @@ function makeTable(headers, id) {
     return table;
 }
 
-/*
+
 $("#infoBtn").click(function() {
     let tableID = "infoTable";
     if (!showingInfo) {
@@ -282,22 +283,3 @@ $("#startBtn").click(function() {
     // Show the question, 4 options as buttons
     showQuestion();
 });
-
-//#region Fullscreen
-/* Get the documentElement (<html>) to display the page in fullscreen */
-/*
-function toggleFullScreen() {
-  var doc = window.document;
-  var docEl = doc.documentElement;
-
-  var requestFullScreen = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
-  var cancelFullScreen = doc.exitFullscreen || doc.mozCancelFullScreen || doc.webkitExitFullscreen || doc.msExitFullscreen;
-
-  if(!doc.fullscreenElement && !doc.mozFullScreenElement && !doc.webkitFullscreenElement && !doc.msFullscreenElement) {
-    requestFullScreen.call(docEl);
-  }
-  else {
-    cancelFullScreen.call(doc);
-  }
-}*/
-//#endregion
