@@ -295,7 +295,7 @@ $("#startBtn").click(function() {
     // Create a session.
     token = getToken();
     // Get a random question from any category
-    questions = loadQuestions(token, 10);
+    //questions = loadQuestions(token, 10);
     // Show the question, 4 options as buttons
     showQuestion();
 });
@@ -326,13 +326,19 @@ function distributeEvenly(elementCount, targetCount, ranomize) {
 
 function getCategoryQuestions(ids) {
     const questionCounts = distributeEvenly(10, ids.length, true);
-    let allQs = [];
+    let allQsSubCategories = [];
 
     for (let i = 0; i < ids.length; i++) {
-        allQs.push(loadQuestionsCat(token, questionCounts[i], ids[i]));
+        allQsSubCategories.push(loadQuestionsCat(token, questionCounts[i], ids[i]));
     }
-
-    console.log(allQs);
+    let allQs = [];
+    
+    allQsSubCategories.forEach(qs => {
+        qs.forEach(q => {
+            allQs.push(q);
+        });
+    });
+    return allQs;
 }
 
 function unflap() {
@@ -373,8 +379,8 @@ function spinWheel() {
     let catIndex = getRandomInt(0, angles.length);
     let randCat = angles[catIndex];
     let actualCategory = categories.find( ({name}) => name === randCat.name);
-    getCategoryQuestions(actualCategory.ids);
-
+    questions = getCategoryQuestions(actualCategory.ids);
+    console.log(questions);
     let sectorRange = getRandomInt(0, 44) - 22; // Offset by 22 for ahead and after centre of sector.
 
     let targetAngle = (fullSpins * 360) + randCat.angle + sectorRange;
