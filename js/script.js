@@ -13,6 +13,8 @@ const questionLetters = [
     'D. '
 ];
 
+let token = "";
+
 let categories = [];
 const validCategories = [
     'General Knowledge',
@@ -22,126 +24,63 @@ const validCategories = [
     'Entertainment',
     'History'
 ];
-
-class Category {
-    constructor(name, ids) {
-        this._name = name;
-        this._ids = ids;
-    }
-
-    get name() {
-        return this._name;
-    }
-    get ids() {
-        return this._ids;
-    }
-    get firstId() {
-        if (this._ids.length > 0) {
-            return this._ids[0];
-        }
-        else {
-            return undefined;
-        }
-    }
-}
+const validSubCategories = [
+    { 'Entertainment' : [
+        'Books',
+        'Film', 'Music',
+        'Musicals & Theatres',
+        'Television',
+        'Video Games',
+        'Board Games',
+        'Comics']},
+    { 'Science' : [
+        'Nature',
+        'Computers',
+        'Mathematics',
+        'Gadgets'
+    ]}
+];
 
 
 $.ajaxSetup({ async: false }); // Probably should deal with async methods properly but this will do, for now.
 
 $.getJSON('https://opentdb.com/api_category.php', function(data) {
     const categoriesRes = data.trivia_categories;
-    for (let i = 0; i < categoriesRes.length; i++) {
-        // For each category retrieved.
 
-        let thisCategory = new Category(categoriesRes[i].name, categoriesRes[i].id);
-        categories.push(thisCategory);
+    validCategories.forEach(vCat => {
+        categories.push({ 'name' : vCat, 'ids' : []});
+    });
 
-        
+    categoriesRes.forEach(category => {
+        // For each category from the API.
 
-
-        /*
-
-        const catName = categoriesRes[i].name;
-        const catId = categoriesRes[i].id;
-        
-        validCategories.forEach(validCat => {
-            if (validCat === catName) {
-                // Name is exactly the same. Therefore only 1
-                let catObj = {name: catName, ids: [catId]}
+        validCategories.forEach(vCat => {
+            if (category.name === vCat) {
+                // No sub-categories and it is valid.
+                const catIndex = categories.findIndex( ({ name }) => name === vCat )
+                categories[catIndex].ids.push(category.id);
             }
-            else if (catName.startsWith(validCat)) {
-                // It's got sub-categories because it only starts with a valid category name
-                categories.forEach(cat => {
-                    if (cat.name === catName) {
-                        // Already added to categories. Just add 1.
+            else {
+                // Could have sub-categories or is invalid.
+                
+                validSubCategories.forEach(vSCat => {
+                    const keyName = Object.keys(vSCat)[0];
+                    if (keyName === vCat) {
+                        const subCategories = vSCat[vCat];
+                        subCategories.forEach(subCat => {
+                            if (category.name.endsWith(subCat)) {
+                                const subCatIndex = categories.findIndex( ({ name }) => name === vCat);
+                                categories[subCatIndex].ids.push(category.id);
+                            }
+                        });
                     }
                 });
             }
-        });*/
-    }
+        });
+
+    });
+
 });
-
-// {name, ids[]}
-
-//#region Loading Category Information
-/*
-let showingInfo = false;
-const categories = [];
-
-
-
-function makeTable(headers, id) {
-    let table  = document.createElement('table');
-    table.setAttribute("id", id);
-    let thead = table.createTHead();
-    for (let i = 0; i < headers.length; i++) {
-        let th = thead.appendChild(document.createElement("th"));
-        th.appendChild(document.createTextNode(headers[i]));
-    }
-
-    return table;
-}
-
-
-$("#infoBtn").click(function() {
-    let tableID = "infoTable";
-    if (!showingInfo) {
-        // Show the table
-        const table = makeTable(["Category", "Easy", "Medium", "Hard", "Total"], tableID);
-        for (let i = 0; i < categories.length; i++) {
-            let tr = table.insertRow();
-    
-            $.getJSON("https://opentdb.com/api_count.php?category=" + categories[i].id, function(data) {
-                let thisCategoryData = data.category_question_count;
-                
-                let tdCat = tr.insertCell();
-                tdCat.appendChild(document.createTextNode(categories[i].name));
-    
-                let tdEasy = tr.insertCell();
-                tdEasy.appendChild(document.createTextNode(thisCategoryData.total_easy_question_count));
-    
-                let tdMed = tr.insertCell();
-                tdMed.appendChild(document.createTextNode(thisCategoryData.total_medium_question_count));
-    
-                let tdHard = tr.insertCell();
-                tdHard.appendChild(document.createTextNode(thisCategoryData.total_hard_question_count));
-    
-                let tdTotal = tr.insertCell();
-                tdTotal.appendChild(document.createTextNode(thisCategoryData.total_question_count));
-            });
-    
-        }
-        $('#quizInfo').append(table);
-        showingInfo = true;
-    }
-    else {
-        // Hide the table.
-        $(`#${tableID}`).remove();
-        showingInfo = false;
-    }
-});
-*/
-//#endregion
 
 function getRandomInt(min, max) {
     min = Math.ceil(min);
@@ -166,6 +105,21 @@ function getToken() {
 function loadQuestions(token, count) {
     let qs = [];
     let fullLink = `https://opentdb.com/api.php?amount=${count}&token=${token}&type=multiple`;
+    $.getJSON(fullLink, function(data) {
+        const responseCode = data.response_code;
+        if (responseCode == 0) {
+            qs = data.results;
+        }
+        else {
+            alert(`ERROR: ${responseCode} - ${responseCodes[responseCode]}`);
+        }
+    });
+    return qs;
+}
+
+function loadQuestionsCat(token, count, category) {
+    let qs = [];
+    let fullLink = `https://opentdb.com/api.php?amount=${count}&token=${token}&category=${category}&type=multiple`;
     $.getJSON(fullLink, function(data) {
         const responseCode = data.response_code;
         if (responseCode == 0) {
@@ -339,12 +293,47 @@ $("#startBtn").click(function() {
     $("#startDiv").remove();
     document.getElementById("questionPanel").style.display = 'flex';
     // Create a session.
-    let token = getToken();
+    token = getToken();
     // Get a random question from any category
     questions = loadQuestions(token, 10);
     // Show the question, 4 options as buttons
     showQuestion();
 });
+
+function distributeEvenly(elementCount, targetCount, ranomize) {
+    const result = elementCount / targetCount;
+    const mantissa = result % 1;
+    
+    const upCount = Math.round(mantissa * targetCount);
+    
+    let arr = [];
+
+    for (let i = 0; i < targetCount; i++) {
+        if (i < upCount) {
+            arr[i] = Math.ceil(result);
+        }
+        else {
+            arr[i] = Math.floor(result);
+        }
+    }
+
+    if (ranomize) {
+        arr = shuffle(arr);
+    }
+
+    return arr;
+}
+
+function getCategoryQuestions(ids) {
+    const questionCounts = distributeEvenly(10, ids.length, true);
+    let allQs = [];
+
+    for (let i = 0; i < ids.length; i++) {
+        allQs.push(loadQuestionsCat(token, questionCounts[i], ids[i]));
+    }
+
+    console.log(allQs);
+}
 
 function unflap() {
     $("#flapper").animate(
@@ -383,6 +372,8 @@ function spinWheel() {
     
     let catIndex = getRandomInt(0, angles.length);
     let randCat = angles[catIndex];
+    let actualCategory = categories.find( ({name}) => name === randCat.name);
+    getCategoryQuestions(actualCategory.ids);
 
     let sectorRange = getRandomInt(0, 44) - 22; // Offset by 22 for ahead and after centre of sector.
 
