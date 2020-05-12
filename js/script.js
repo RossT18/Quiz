@@ -41,6 +41,24 @@ const validSubCategories = [
     ]}
 ];
 
+let correctSound;
+let incorrectSound;
+let woodSound;
+
+function sound(src) {
+    this.sound = document.createElement("audio");
+    this.sound.src = src;
+    this.sound.setAttribute("preload", "auto");
+    this.sound.setAttribute("controls", "none");
+    this.sound.style.display = "none";
+    document.body.appendChild(this.sound);
+    this.play = function(){
+        this.sound.play();
+    }
+    this.stop = function(){
+        this.sound.pause();
+    }    
+}
 
 $.ajaxSetup({ async: false }); // Probably should deal with async methods properly but this will do, for now.
 
@@ -272,6 +290,7 @@ $(document).on("click", ".answerBtn", function() {
                 'background-color': '#3be026'
             });
             correctCount++;
+            correctSound.play();
         }
         else {
             $(clickedBtn).css({
@@ -280,6 +299,7 @@ $(document).on("click", ".answerBtn", function() {
                 'background': 'none',
                 'background-color': '#c91414'
             });
+            incorrectSound.play();
             lightCorrectAnswer();
         }
     }, correctAnswerDelay);
@@ -298,6 +318,9 @@ $("#startBtn").click(function() {
     //questions = loadQuestions(token, 10);
     // Show the question, 4 options as buttons
     showQuestion();
+
+    correctSound = new sound("sounds/correct.wav");
+    incorrectSound = new sound("sounds/incorrect.wav");
 });
 
 function distributeEvenly(elementCount, targetCount, ranomize) {
@@ -354,6 +377,7 @@ function unflap() {
 }
 
 function flap() {
+    woodSound.play();
     $("#flapper").animate(
         { deg: -50 },
         {
@@ -375,6 +399,8 @@ function spinWheel() {
         angles.push(angleObj);
         currentAngle -= 60;
     });
+
+    woodSound = new sound("sounds/wood_tick.wav");
     
     let catIndex = getRandomInt(0, angles.length);
     let randCat = angles[catIndex];
@@ -413,3 +439,7 @@ function spinWheel() {
 $("#spin").click(function() {
     spinWheel();
 });
+
+
+
+
