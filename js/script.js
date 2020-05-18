@@ -391,7 +391,7 @@ function flap() {
 }
 
 function spinWheel() {
-    let fullSpins =  getRandomInt(2, 6);
+    let fullSpins =  getRandomInt(2, 4);
     let angles = [];
     let currentAngle = 360;
     validCategories.forEach(category => {
@@ -415,7 +415,7 @@ function spinWheel() {
     $("#wheel").animate(
         { deg: targetAngle },
         {
-            duration: 5000,
+            duration: 6000,
             step: function(now) {
                 const flapperPoint = (now - 30) % 60;
                 if (hasFlapped && flapperPoint > range) {
