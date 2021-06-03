@@ -62,6 +62,12 @@ function sound(src) {
 
 $.ajaxSetup({ async: false }); // Probably should deal with async methods properly but this will do, for now.
 
+
+/**
+ * Fill categories array with objects consisting of name and ids.
+ * Where name is the category name, e.g. "Entertainment",
+ * and ids is an array of ids for each sub-category (just one id for categories without sub-categories)
+ */
 $.getJSON('https://opentdb.com/api_category.php', function(data) {
     const categoriesRes = data.trivia_categories;
 
@@ -167,17 +173,21 @@ let questionNumber = 0;
 let questions = [];
 let correctCount = 0;
 
+function showResults() {
+    $("#qNumP").remove();
+    $("#qInfoP").remove();
+    $("#qP").css({
+        'font-size': '40px'
+    })
+    $("#qP").html(`Finished!<br>You Scored: ${correctCount}`);
+    $("#qAnswerPanel").empty();
+    $("#timerBar").remove();
+}
+
 function showQuestion() {
     if (questionNumber >= questions.length) {
         //There is no next question
-        $("#qNumP").remove();
-        $("#qInfoP").remove();
-        $("#qP").css({
-            'font-size': '40px'
-        })
-        $("#qP").html(`Finished!<br>You Scored: ${correctCount}`);
-        $("#qAnswerPanel").empty();
-        $("#timerBar").remove();
+        showResults();
         return;
     }
 
@@ -188,6 +198,7 @@ function showQuestion() {
     $("#qP").html(q.question);
 
     $("#qAnswerPanel").empty();
+    // Shuffle the correct answer with the incorrect answers
     const answers = shuffle(q.incorrect_answers.concat(q.correct_answer));
     correctAnswer = q.correct_answer;
     for (let i = 0; i < answers.length; i++) {
@@ -200,6 +211,10 @@ function showQuestion() {
     questionNumber++;
 
     toggleQuestionTimer();
+}
+
+function disableAnswerBtns() {
+    $(".answerBtn").attr('disabled', true);
 }
 
 let id = 0;
@@ -235,13 +250,13 @@ function resetTimer() {
 
 function outOfTime() {
     // If here is reached, they definitely haven't clicked anything and have run out of time on the question.
-    // Do a wrong.
+    // Do a "wrong" because not answering is incorrect.
     // Will just have to show a red time bar and disable choosing instead of light up an answer with red.
     $("#timerBar").css({
         'background-color': '#FF0000',
         'border-color': '#800000'
     });
-    $(".answerBtn").attr('disabled', true);
+    disableAnswerBtns();
     lightCorrectAnswer();
     setTimeout(() => {
         showQuestion();
@@ -264,12 +279,14 @@ function lightCorrectAnswer() {
     }
 }
 
+
+const correctAnswerDelay = 3000;
+const nextQuestionDelay = correctAnswerDelay + 3000;
+
 $(document).on("click", ".answerBtn", function() {
     const clickedBtn = this;
     const value = $(this).attr('value');
     const isCorrect = value === correctAnswer;
-    const correctAnswerDelay = 3000;
-    const nextQuestionDelay = correctAnswerDelay + 3000;
 
     toggleQuestionTimer();
 
@@ -278,17 +295,10 @@ $(document).on("click", ".answerBtn", function() {
         'text-decoration': 'underline'
     });
 
-    $(".answerBtn").attr('disabled', true);
+    disableAnswerBtns();
 
     setTimeout(() => {
         if (isCorrect) {
-            $(clickedBtn).css({
-                'font-weight': 'bold',
-                'text-decoration': 'none',
-                'border-color': '#3be026',
-                'background': 'none',
-                'background-color': '#3be026'
-            });
             correctCount++;
             correctSound.play();
         }
@@ -300,9 +310,10 @@ $(document).on("click", ".answerBtn", function() {
                 'background-color': '#c91414'
             });
             incorrectSound.play();
-            lightCorrectAnswer();
         }
+        lightCorrectAnswer();
     }, correctAnswerDelay);
+
     setTimeout(() => {
         showQuestion();
     }, nextQuestionDelay);
@@ -323,7 +334,7 @@ $("#startBtn").click(function() {
     incorrectSound = new sound("sounds/incorrect.wav");
 });
 
-function distributeEvenly(elementCount, targetCount, ranomize) {
+function distributeEvenly(elementCount, targetCount, randomize) {
     const result = elementCount / targetCount;
     const mantissa = result % 1;
     
@@ -340,7 +351,7 @@ function distributeEvenly(elementCount, targetCount, ranomize) {
         }
     }
 
-    if (ranomize) {
+    if (randomize) {
         arr = shuffle(arr);
     }
 
@@ -399,14 +410,12 @@ function spinWheel() {
         angles.push(angleObj);
         currentAngle -= 60;
     });
-
     woodSound = new sound("sounds/wood_tick.wav");
     
     let catIndex = getRandomInt(0, angles.length);
     let randCat = angles[catIndex];
     let actualCategory = categories.find( ({name}) => name === randCat.name);
     questions = getCategoryQuestions(actualCategory.ids);
-    console.log(questions);
     let sectorRange = getRandomInt(0, 44) - 22; // Offset by 22 for ahead and after centre of sector.
 
     let targetAngle = (fullSpins * 360) + randCat.angle + sectorRange;
@@ -439,7 +448,3 @@ function spinWheel() {
 $("#spin").click(function() {
     spinWheel();
 });
-
-
-
-
