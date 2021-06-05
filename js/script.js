@@ -279,7 +279,7 @@ function lightCorrectAnswer() {
     }
 }
 
-
+let categoryName = "";
 const correctAnswerDelay = 3000;
 const nextQuestionDelay = correctAnswerDelay + 3000;
 
@@ -375,6 +375,13 @@ function getCategoryQuestions(ids) {
     return allQs;
 }
 
+function wheelComplete() {
+    $("#startTitle").html(categoryName + " Questions");
+    $("#startSubtitle").html("Answer the selected 10 questions correctly.<br>Getting a question wrong will shuffle the questions and you lose the answer chain.");
+    $("#startBtn").css({ visibility: `visible` });
+    $("#spin").css({ visibility: `hidden` });
+}
+
 function unflap() {
     $("#flapper").animate(
         { deg: 0 },
@@ -415,6 +422,8 @@ function spinWheel() {
     let catIndex = getRandomInt(0, angles.length);
     let randCat = angles[catIndex];
     let actualCategory = categories.find( ({name}) => name === randCat.name);
+
+    categoryName = actualCategory.name;
     questions = getCategoryQuestions(actualCategory.ids);
     let sectorRange = getRandomInt(0, 44) - 22; // Offset by 22 for ahead and after centre of sector.
 
@@ -425,6 +434,7 @@ function spinWheel() {
         { deg: targetAngle },
         {
             duration: 6000,
+            complete: wheelComplete,
             step: function(now) {
                 const flapperPoint = (now - 30) % 60;
                 if (hasFlapped && flapperPoint > range) {

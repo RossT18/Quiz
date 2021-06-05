@@ -59,6 +59,10 @@ button:disabled {
     font-size: 30px;
 }
 
+#startSubtitle {
+    text-align: center;
+}
+
 #questionPanel {
     display: flex;
     justify-content: space-between;
